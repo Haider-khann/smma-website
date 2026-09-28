@@ -72,22 +72,24 @@ model User {
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  clientProfile    ClientProfile?
-  projectsOwned    Project[]       @relation("ClientProjects")
-  projectsManaged  Project[]       @relation("SMMProjects")
-  tasksAssigned    Task[]          @relation("AssignedTasks")
-  messagesSent     Message[]       @relation("SentMessages")
-  messagesReceived Message[]       @relation("ReceivedMessages")
-  notifications    Notification[]
-  reviews          Review[]
-  supportTickets   SupportTicket[]
-  invoices         Invoice[]
-  proposalsCreated Proposal[]      @relation("ProposalsCreated")
-  reports          Report[]
-  campaigns        Campaign[]
-  contents         Content[]
-  files            File[]
-  quoteRequests    QuoteRequest[]
+  clientProfile      ClientProfile?
+  projectsOwned      Project[]       @relation("ClientProjects")
+  projectsManaged    Project[]       @relation("SMMProjects")
+  tasksAssigned      Task[]          @relation("AssignedTasks")
+  messagesSent       Message[]       @relation("SentMessages")
+  messagesReceived   Message[]       @relation("ReceivedMessages")
+  notifications      Notification[]
+  reviews            Review[]
+  supportTickets     SupportTicket[]
+  invoices           Invoice[]
+  proposalsCreated   Proposal[]      @relation("ProposalsCreated")
+  reports            Report[]
+  campaigns          Campaign[]
+  contents           Content[]
+  files              File[]
+  quoteRequests      QuoteRequest[]
+  timesheets         Timesheet[]
+  invitationsCreated Invitation[]    @relation("InvitationsCreated")
 
   @@index([email])
 }
@@ -239,6 +241,7 @@ model Project {
   reports      Report[]
   services     ProjectService[]
   contents     Content[]
+  timesheets   Timesheet[]
 }
 
 model ProjectService {
@@ -448,4 +451,45 @@ model Notification {
   createdAt DateTime @default(now())
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// ─────────────────────────────────────────────
+// TIMESHEETS
+// ─────────────────────────────────────────────
+
+model Timesheet {
+  id          String   @id @default(cuid())
+  userId      String
+  projectId   String?
+  hours       Float
+  date        DateTime
+  description String?
+  createdAt   DateTime @default(now())
+
+  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────────
+// INVITATIONS
+// ─────────────────────────────────────────────
+
+model Invitation {
+  id          String    @id @default(cuid())
+  email       String    @unique
+  name        String
+  token       String    @unique
+  role        Role      @default(SMM)
+  expiresAt   DateTime
+  accepted    Boolean   @default(false)
+  acceptedAt  DateTime?
+  createdById String
+  createdAt   DateTime  @default(now())
+
+  createdBy User @relation("InvitationsCreated", fields: [createdById], references: [id], onDelete: Cascade)
+
+  @@index([email])
+  @@index([token])
 }
