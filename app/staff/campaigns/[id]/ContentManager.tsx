@@ -108,6 +108,11 @@ export default function ContentManager({
     router.refresh();
   }
 
+  async function duplicateContent(contentId: string) {
+    const res = await fetch('/api/staff/content/' + contentId + '/duplicate', { method: 'POST' });
+    if (res.ok) router.refresh();
+  }
+
   async function deleteContent(contentId: string) {
     if (!confirm('Delete this content?')) return;
     const res = await fetch('/api/staff/content/' + contentId, { method: 'DELETE' });
@@ -215,6 +220,7 @@ export default function ContentManager({
                   <button onClick={() => submitForApproval(c.id)} className='text-xs bg-purple-100 text-purple-700 px-3 py-1 rounded hover:bg-purple-200'>Resubmit for Review</button>
                 )}
                 <button onClick={() => startEdit(c)} className='text-xs text-blue-600 hover:underline'>Edit</button>
+                <button onClick={() => duplicateContent(c.id)} className='text-xs text-slate-600 hover:underline'>Duplicate</button>
                 <button onClick={() => deleteContent(c.id)} className='text-xs text-red-600 hover:underline'>Delete</button>
               </div>
             </div>

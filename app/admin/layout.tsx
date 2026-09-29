@@ -20,6 +20,7 @@ export default async function AdminLayout({
     { href: '/admin/reports', label: 'Reports', icon: 'chart' as const },
     { href: '/admin/invoices', label: 'Invoices', icon: 'invoice' as const },
     { href: '/admin/reviews', label: 'Reviews', icon: 'star' as const },
+    { href: '/admin/support', label: 'Support', icon: 'help' as const },
     { href: '/admin/staff', label: 'Staff', icon: 'users' as const },
     { href: '/admin/services', label: 'Services', icon: 'settings' as const },
     { href: '/admin/packages', label: 'Packages', icon: 'package' as const },

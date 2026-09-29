@@ -26,6 +26,7 @@ export default async function ClientLayout({
     { href: '/dashboard/reports', label: 'Reports', icon: 'chart' as const },
     { href: '/dashboard/invoices', label: 'Invoices', icon: 'invoice' as const },
     { href: '/dashboard/reviews', label: 'Reviews', icon: 'star' as const },
+    { href: '/dashboard/support', label: 'Support', icon: 'help' as const },
   ];
 
   return (

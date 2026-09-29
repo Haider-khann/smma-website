@@ -25,6 +25,8 @@ export default async function StaffLayout({
     { href: '/staff/content', label: 'Content', icon: 'palette' as const },
     { href: '/staff/messages', label: 'Messages', icon: 'mail' as const },
     { href: '/staff/reports', label: 'Reports', icon: 'chart' as const },
+    { href: '/staff/timesheets', label: 'Timesheets', icon: 'invoice' as const },
+    { href: '/staff/analytics', label: 'Analytics', icon: 'chart' as const },
   ];
 
   return (

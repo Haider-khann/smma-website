@@ -80,7 +80,10 @@ model User {
   messagesReceived   Message[]       @relation("ReceivedMessages")
   notifications      Notification[]
   reviews            Review[]
-  supportTickets     SupportTicket[]
+  supportTickets   SupportTicket[] @relation("SupportTickets")
+  supportReplies   SupportReply[]  @relation("SupportReplies") @relation("SupportTickets")
+  supportReplies   SupportReply[]  @relation("SupportReplies") @relation("SupportTickets")
+  supportReplies     SupportReply[]  @relation("SupportReplies")
   invoices           Invoice[]
   proposalsCreated   Proposal[]      @relation("ProposalsCreated")
   reports            Report[]
@@ -90,6 +93,7 @@ model User {
   quoteRequests      QuoteRequest[]
   timesheets         Timesheet[]
   invitationsCreated Invitation[]    @relation("InvitationsCreated")
+  timesheetReviews   Timesheet[]     @relation("TimesheetReviews")
 
   @@index([email])
 }
@@ -429,16 +433,62 @@ model FAQ {
 // ─────────────────────────────────────────────
 
 model SupportTicket {
-  id        String   @id @default(cuid())
-  clientId  String
-  subject   String
-  body      String
-  status    String   @default("OPEN")
-  response  String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id           String   @id @default(cuid())
+  clientId     String
+  subject      String
+  body         String
+  priority     String   @default("NORMAL")
+  category     String?
+  status       String   @default("OPEN")
+  escalated    Boolean  @default(false)
+  escalatedBy  String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  client User @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  client  User           @relation("SupportTickets", fields: [clientId], references: [id], onDelete: Cascade)
+  replies SupportReply[]
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model SupportReply {
+  id        String   @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User          @relation("SupportReplies", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model SupportReply {
+  id        String   @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User          @relation("SupportReplies", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
+}
+
+model SupportReply {
+  id        String   @id @default(cuid())
+  ticketId  String
+  authorId  String
+  body      String
+  createdAt DateTime @default(now())
+
+  ticket SupportTicket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  author User          @relation("SupportReplies", fields: [authorId], references: [id], onDelete: Cascade)
+
+  @@index([ticketId])
 }
 
 model Notification {
@@ -458,18 +508,24 @@ model Notification {
 // ─────────────────────────────────────────────
 
 model Timesheet {
-  id          String   @id @default(cuid())
-  userId      String
-  projectId   String?
-  hours       Float
-  date        DateTime
-  description String?
-  createdAt   DateTime @default(now())
+  id           String    @id @default(cuid())
+  userId       String
+  projectId    String?
+  hours        Float
+  date         DateTime
+  description  String?
+  status       String    @default("PENDING")
+  reviewedById String?
+  reviewedAt   DateTime?
+  reviewNotes  String?
+  createdAt    DateTime  @default(now())
 
-  user    User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  project Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  project    Project? @relation(fields: [projectId], references: [id], onDelete: SetNull)
+  reviewedBy User?    @relation("TimesheetReviews", fields: [reviewedById], references: [id])
 
   @@index([userId])
+  @@index([status])
 }
 
 // ─────────────────────────────────────────────
